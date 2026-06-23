@@ -3,8 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { estaVencido } from '@/lib/fechas'
 
 export async function POST(req) {
-  const { codigo, nombre, telefono } = await req.json()
-  if (!codigo || !nombre || !telefono) {
+  const { codigo, nombre } = await req.json()
+  if (!codigo || !nombre) {
     return NextResponse.json({ ok: false, error: 'Faltan datos' }, { status: 400 })
   }
   const cod = String(codigo).trim().toUpperCase()
@@ -31,7 +31,6 @@ export async function POST(req) {
     .update({
       estado: 'RECLAMADO',
       nombre_cliente: String(nombre).slice(0, 80),
-      telefono_cliente: String(telefono).slice(0, 30),
       escaneado_en: new Date().toISOString(),
     })
     .eq('codigo', cod)

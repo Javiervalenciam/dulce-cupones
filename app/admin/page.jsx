@@ -16,6 +16,36 @@ function getCouponUrl(cod) {
   return `${getBaseUrl()}/c/${cod}`
 }
 
+function LogoLockup({ eyebrow, title, text }) {
+  return (
+    <div className="ops-brand">
+      <div className="ops-logo-ring">
+        <img src="/logo.png" alt="Dulce Mezcla" width="92" height="92" />
+      </div>
+      <div>
+        <p className="ops-eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        {text && <p className="ops-lead">{text}</p>}
+      </div>
+    </div>
+  )
+}
+
+function StatCard({ tone, icon, value, label, note }) {
+  return (
+    <div className={`ops-stat ops-stat--${tone}`}>
+      <span className="ops-stat-icon" aria-hidden="true">
+        {icon}
+      </span>
+      <div>
+        <b>{value}</b>
+        <span>{label}</span>
+        {note && <small>{note}</small>}
+      </div>
+    </div>
+  )
+}
+
 export default function Admin() {
   const [pin, setPin] = useState('')
   const [auth, setAuth] = useState(false)
@@ -140,6 +170,7 @@ export default function Admin() {
   function toggleSel(cod) {
     setSel((s) => (s.includes(cod) ? s.filter((x) => x !== cod) : [...s, cod]))
   }
+
   function toggleTodos() {
     setSel((s) => (s.length === cupones.length ? [] : cupones.map((c) => c.codigo)))
   }
@@ -176,6 +207,7 @@ export default function Admin() {
     const dataUrl = await QRCode.toDataURL(getCouponUrl(cod), { width: 420, margin: 2 })
     setQrModal({ cod, dataUrl })
   }
+
   async function descargarUno(cod) {
     const dataUrl = await QRCode.toDataURL(getCouponUrl(cod), { width: 700, margin: 2 })
     const a = document.createElement('a')
@@ -183,6 +215,7 @@ export default function Admin() {
     a.download = cod + '.png'
     a.click()
   }
+
   async function descargarSeleccion() {
     if (sel.length === 0) {
       setAviso('Selecciona cupones para descargar')
@@ -203,221 +236,270 @@ export default function Admin() {
 
   function compartir(cod) {
     const url = getCouponUrl(cod)
-    const texto = encodeURIComponent('Tu cupón de Dulce Mezcla 🧁')
+    const texto = encodeURIComponent('Tu cupón de Dulce Mezcla')
     window.open('https://wa.me/?text=' + texto + '%20' + encodeURIComponent(url), '_blank')
   }
 
   if (!auth) {
     return (
-      <main className="card">
-        <div className="logo">DM</div>
-        <h1>Panel Dulce Mezcla</h1>
-        <input
-          type="password"
-          placeholder="PIN de administrador"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && entrar()}
-        />
-        <button onClick={entrar}>Entrar</button>
-        {aviso && <p className="error">{aviso}</p>}
+      <main className="ops-shell ops-shell--login">
+        <div className="ops-scallop ops-scallop--top" aria-hidden="true" />
+        <section className="ops-login-card" aria-labelledby="admin-login-title">
+          <LogoLockup
+            eyebrow="ACCESO PRIVADO"
+            title="Admin Dulce Mezcla"
+            text="Gestiona lotes, estados y códigos QR desde un panel ligero y claro."
+          />
+          <label className="ops-field">
+            <span>PIN de administrador</span>
+            <input
+              type="password"
+              placeholder="Ingresa el PIN"
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && entrar()}
+            />
+          </label>
+          <button className="ops-btn ops-btn--primary" onClick={entrar}>
+            Entrar al panel
+          </button>
+          {aviso && <p className="ops-alert ops-alert--error">{aviso}</p>}
+        </section>
+        <div className="ops-scallop ops-scallop--bottom" aria-hidden="true" />
       </main>
     )
   }
 
   return (
-    <div className="wrap">
-      <header className="topbar">
-        <div className="brand">
-          <span className="logo sm">DM</span> Dulce Mezcla · Admin
-        </div>
-        <a className="btn-sec" href="/caja">
-          Ir a Caja →
-        </a>
-      </header>
+    <main className="ops-shell ops-shell--admin">
+      <div className="ops-scallop ops-scallop--top" aria-hidden="true" />
 
-      <section className="stats">
-        <div className="stat total">
-          <b>{stats?.TOTAL ?? '—'}</b>
-          <span>Total</span>
-        </div>
-        <div className="stat disp">
-          <b>{stats?.DISPONIBLE ?? '—'}</b>
-          <span>Disponibles</span>
-        </div>
-        <div className="stat recl">
-          <b>{stats?.RECLAMADO ?? '—'}</b>
-          <span>Reclamados</span>
-        </div>
-        <div className="stat red">
-          <b>{stats?.REDIMIDO ?? '—'}</b>
-          <span>Entregados</span>
-        </div>
-        <div className="stat elim">
-          <b>{stats?.ELIMINADO ?? '—'}</b>
-          <span>Eliminados</span>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>Generar cupones</h2>
-        <div className="grid-gen">
-          <label>
-            Prefijo
-            <select value={genPrefijo} onChange={(e) => setGenPrefijo(e.target.value)}>
-              <option>DULCE</option>
-              <option>MEZCLA</option>
-            </select>
-          </label>
-          <label>
-            Cantidad (0–100)
-            <input
-              type="number"
-              min="0"
-              max="100"
-              value={genCantidad}
-              onChange={(e) => setGenCantidad(e.target.value)}
-            />
-          </label>
-          <label>
-            Vence (opcional)
-            <input type="date" value={genVence} onChange={(e) => setGenVence(e.target.value)} />
-          </label>
-          <label className="col2">
-            Promoción
-            <input value={genPromo} onChange={(e) => setGenPromo(e.target.value)} />
-          </label>
-          <label className="col2">
-            Descripción
-            <input value={genDesc} onChange={(e) => setGenDesc(e.target.value)} />
-          </label>
-        </div>
-        <button onClick={generar} disabled={cargando}>
-          Generar lote
-        </button>
-      </section>
-
-      <section className="panel">
-        <div className="filtros">
-          <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
-            {ESTADOS.map((e) => (
-              <option key={e}>{e}</option>
-            ))}
-          </select>
-          <select value={filtroPrefijo} onChange={(e) => setFiltroPrefijo(e.target.value)}>
-            {PREFIJOS.map((p) => (
-              <option key={p}>{p}</option>
-            ))}
-          </select>
-          <input
-            placeholder="Buscar código, nombre o teléfono"
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && cargarLista()}
+      <div className="ops-wrap">
+        <header className="ops-hero">
+          <LogoLockup
+            eyebrow="PASTELERÍA & REPOSTERÍA"
+            title="Gestión de cupones"
+            text="Crea, descarga, filtra y revisa el ciclo completo de cada beneficio."
           />
-          <button className="btn-sec" onClick={cargarLista}>
-            Buscar
-          </button>
-        </div>
+          <a className="ops-btn ops-btn--soft ops-hero-action" href="/caja">
+            Ir a Caja
+          </a>
+        </header>
 
-        <div className="acciones">
-          <button className="btn-sec" onClick={descargarSeleccion}>
-            ⬇️ Descargar QR ({sel.length})
-          </button>
-          <button className="btn-sec" onClick={() => eliminar('soft')}>
-            🗑️ Eliminar
-          </button>
-          <button className="btn-sec" onClick={() => eliminar('restore')}>
-            ♻️ Restaurar
-          </button>
-          <button className="btn-sec danger" onClick={() => eliminar('hard')}>
-            ❌ Borrar definitivo
-          </button>
-        </div>
-        {aviso && <p className="aviso">{aviso}</p>}
+        <section className="ops-stats" aria-label="Resumen de cupones">
+          <StatCard tone="total" icon="✦" value={stats?.TOTAL ?? '—'} label="Total" note="Cupones creados" />
+          <StatCard
+            tone="available"
+            icon="◇"
+            value={stats?.DISPONIBLE ?? '—'}
+            label="Disponibles"
+            note="Listos para reclamar"
+          />
+          <StatCard
+            tone="claimed"
+            icon="♡"
+            value={stats?.RECLAMADO ?? '—'}
+            label="Reclamados"
+            note="Pendientes de caja"
+          />
+          <StatCard
+            tone="delivered"
+            icon="✓"
+            value={stats?.REDIMIDO ?? '—'}
+            label="Entregados"
+            note="Aplicados en caja"
+          />
+          <StatCard
+            tone="removed"
+            icon="×"
+            value={stats?.ELIMINADO ?? '—'}
+            label="Eliminados"
+            note="Fuera de circulación"
+          />
+        </section>
 
-        <div className="tabla-wrap">
-          <table className="tabla">
-            <thead>
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={sel.length > 0 && sel.length === cupones.length}
-                    onChange={toggleTodos}
-                  />
-                </th>
-                <th>Código</th>
-                <th>Estado</th>
-                <th>Promo</th>
-                <th>Cliente</th>
-                <th>Teléfono</th>
-                <th>Vence</th>
-                <th>Detalle</th>
-                <th>QR</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cupones.map((c) => (
-                <tr key={c.codigo} className={sel.includes(c.codigo) ? 'selrow' : ''}>
-                  <td>
+        <section className="ops-panel ops-panel--generator">
+          <div className="ops-panel-head">
+            <div>
+              <p className="ops-section-label">Nuevo lote</p>
+              <h2>Generar cupones</h2>
+            </div>
+            <span className="ops-chip">QR automático</span>
+          </div>
+
+          <div className="ops-form-grid">
+            <label className="ops-field">
+              <span>Prefijo</span>
+              <select value={genPrefijo} onChange={(e) => setGenPrefijo(e.target.value)}>
+                <option>DULCE</option>
+                <option>MEZCLA</option>
+              </select>
+            </label>
+            <label className="ops-field">
+              <span>Cantidad</span>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={genCantidad}
+                onChange={(e) => setGenCantidad(e.target.value)}
+              />
+            </label>
+            <label className="ops-field">
+              <span>Vence</span>
+              <input type="date" value={genVence} onChange={(e) => setGenVence(e.target.value)} />
+            </label>
+            <label className="ops-field ops-field--wide">
+              <span>Promoción</span>
+              <input value={genPromo} onChange={(e) => setGenPromo(e.target.value)} />
+            </label>
+            <label className="ops-field ops-field--wide">
+              <span>Descripción</span>
+              <input value={genDesc} onChange={(e) => setGenDesc(e.target.value)} />
+            </label>
+          </div>
+
+          <button className="ops-btn ops-btn--primary" onClick={generar} disabled={cargando}>
+            {cargando ? 'Procesando...' : 'Generar lote'}
+          </button>
+        </section>
+
+        <section className="ops-panel">
+          <div className="ops-panel-head ops-panel-head--stack">
+            <div>
+              <p className="ops-section-label">Inventario</p>
+              <h2>Cupones activos</h2>
+            </div>
+            <div className="ops-filters">
+              <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)} aria-label="Estado">
+                {ESTADOS.map((e) => (
+                  <option key={e}>{e}</option>
+                ))}
+              </select>
+              <select value={filtroPrefijo} onChange={(e) => setFiltroPrefijo(e.target.value)} aria-label="Prefijo">
+                {PREFIJOS.map((p) => (
+                  <option key={p}>{p}</option>
+                ))}
+              </select>
+              <input
+                placeholder="Buscar código o nombre"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && cargarLista()}
+              />
+              <button className="ops-btn ops-btn--soft" onClick={cargarLista}>
+                Buscar
+              </button>
+            </div>
+          </div>
+
+          <div className="ops-actions">
+            <button className="ops-btn ops-btn--soft" onClick={descargarSeleccion}>
+              Descargar QR ({sel.length})
+            </button>
+            <button className="ops-btn ops-btn--soft" onClick={() => eliminar('soft')}>
+              Eliminar
+            </button>
+            <button className="ops-btn ops-btn--mint" onClick={() => eliminar('restore')}>
+              Restaurar
+            </button>
+            <button className="ops-btn ops-btn--danger" onClick={() => eliminar('hard')}>
+              Borrar definitivo
+            </button>
+          </div>
+
+          {aviso && <p className="ops-alert ops-alert--notice">{aviso}</p>}
+
+          <div className="ops-table-wrap">
+            <table className="ops-table">
+              <thead>
+                <tr>
+                  <th>
                     <input
                       type="checkbox"
-                      checked={sel.includes(c.codigo)}
-                      onChange={() => toggleSel(c.codigo)}
+                      aria-label="Seleccionar todos"
+                      checked={sel.length > 0 && sel.length === cupones.length}
+                      onChange={toggleTodos}
                     />
-                  </td>
-                  <td className="mono">{c.codigo}</td>
-                  <td>
-                    <span className={'badge ' + c.estado}>{etiquetaEstadoCupon(c.estado)}</span>
-                  </td>
-                  <td>{c.promocion}</td>
-                  <td>{c.nombre_cliente || '—'}</td>
-                  <td>{c.telefono_cliente || '—'}</td>
-                  <td>{c.vence_en || '—'}</td>
-                  <td>{c.detalle_entregado || '—'}</td>
-                  <td className="acc">
-                    <button title="Ver QR" onClick={() => verQR(c.codigo)}>
-                      👁️
-                    </button>
-                    <button title="Descargar" onClick={() => descargarUno(c.codigo)}>
-                      ⬇️
-                    </button>
-                    <button title="Compartir" onClick={() => compartir(c.codigo)}>
-                      📤
-                    </button>
-                  </td>
+                  </th>
+                  <th>Código</th>
+                  <th>Estado</th>
+                  <th>Promo</th>
+                  <th>Cliente</th>
+                  <th>Vence</th>
+                  <th>Detalle</th>
+                  <th>QR</th>
                 </tr>
-              ))}
-              {cupones.length === 0 && (
-                <tr>
-                  <td colSpan="9" className="vacio">
-                    {cargando ? 'Cargando...' : 'Sin resultados'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              </thead>
+              <tbody>
+                {cupones.map((c) => (
+                  <tr key={c.codigo} className={sel.includes(c.codigo) ? 'is-selected' : ''}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        aria-label={`Seleccionar ${c.codigo}`}
+                        checked={sel.includes(c.codigo)}
+                        onChange={() => toggleSel(c.codigo)}
+                      />
+                    </td>
+                    <td className="ops-mono">{c.codigo}</td>
+                    <td>
+                      <span className={'badge ' + c.estado}>{etiquetaEstadoCupon(c.estado)}</span>
+                    </td>
+                    <td>{c.promocion || '—'}</td>
+                    <td>{c.nombre_cliente || '—'}</td>
+                    <td>{c.vence_en || '—'}</td>
+                    <td>{c.detalle_entregado || '—'}</td>
+                    <td className="ops-row-actions">
+                      <button title="Ver QR" aria-label={`Ver QR de ${c.codigo}`} onClick={() => verQR(c.codigo)}>
+                        Ver
+                      </button>
+                      <button
+                        title="Descargar"
+                        aria-label={`Descargar QR de ${c.codigo}`}
+                        onClick={() => descargarUno(c.codigo)}
+                      >
+                        PNG
+                      </button>
+                      <button title="Compartir" aria-label={`Compartir ${c.codigo}`} onClick={() => compartir(c.codigo)}>
+                        Enviar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {cupones.length === 0 && (
+                  <tr>
+                    <td colSpan="8" className="ops-empty">
+                      {cargando ? 'Cargando cupones...' : 'Sin resultados para este filtro'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
 
       {qrModal && (
-        <div className="modal" onClick={() => setQrModal(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+        <div className="modal ops-modal" onClick={() => setQrModal(null)}>
+          <div className="modal-card ops-modal-card" onClick={(e) => e.stopPropagation()}>
+            <p className="ops-section-label">Código QR</p>
             <h3>{qrModal.cod}</h3>
-            <img src={qrModal.dataUrl} alt="QR" />
-            <p className="mono">
-              {getCouponUrl(qrModal.cod)}
-            </p>
+            <img src={qrModal.dataUrl} alt={`QR del cupón ${qrModal.cod}`} />
+            <p className="ops-mono">{getCouponUrl(qrModal.cod)}</p>
             <div className="modal-acc">
-              <button onClick={() => descargarUno(qrModal.cod)}>Descargar PNG</button>
-              <button className="btn-sec" onClick={() => setQrModal(null)}>
+              <button className="ops-btn ops-btn--primary" onClick={() => descargarUno(qrModal.cod)}>
+                Descargar PNG
+              </button>
+              <button className="ops-btn ops-btn--soft" onClick={() => setQrModal(null)}>
                 Cerrar
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+
+      <div className="ops-scallop ops-scallop--bottom" aria-hidden="true" />
+    </main>
   )
 }

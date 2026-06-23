@@ -2,6 +2,21 @@
 import { useEffect, useRef, useState } from 'react'
 import { etiquetaEstadoCupon, normalizarCodigoCupon } from '@/lib/cuponCodigo'
 
+function LogoLockup({ compact = false }) {
+  return (
+    <div className={compact ? 'cash-brand cash-brand--compact' : 'cash-brand'}>
+      <div className="ops-logo-ring">
+        <img src="/logo.png" alt="Dulce Mezcla" width="92" height="92" />
+      </div>
+      <div>
+        <p className="ops-eyebrow">PUNTO DE ENTREGA</p>
+        <h1>Caja Dulce Mezcla</h1>
+        {!compact && <p className="ops-lead">Escanea el cupón reclamado y confirma la entrega en segundos.</p>}
+      </div>
+    </div>
+  )
+}
+
 export default function Caja() {
   const [pin, setPin] = useState('')
   const [auth, setAuth] = useState(false)
@@ -79,7 +94,7 @@ export default function Caja() {
     setCargando(false)
     if (j.ok) {
       setCodigo(j.cupon.codigo)
-      setMsg({ t: 'ok', x: '✅ Entregado a ' + (j.cupon.nombre_cliente || 'cliente') })
+      setMsg({ t: 'ok', x: 'Entregado a ' + (j.cupon.nombre_cliente || 'cliente') })
       setCupon(j.cupon)
     } else {
       setMsg({ t: 'error', x: j.error })
@@ -130,94 +145,155 @@ export default function Caja() {
 
   if (!auth) {
     return (
-      <main className="card">
-        <div className="logo">DM</div>
-        <h1>🎪 Caja</h1>
-        <input
-          type="password"
-          placeholder="PIN"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && entrar()}
-        />
-        <button onClick={entrar}>Entrar</button>
+      <main className="ops-shell ops-shell--login ops-shell--cash">
+        <div className="ops-scallop ops-scallop--top" aria-hidden="true" />
+        <section className="ops-login-card" aria-labelledby="cash-login-title">
+          <LogoLockup />
+          <label className="ops-field">
+            <span>PIN de caja</span>
+            <input
+              type="password"
+              placeholder="Ingresa el PIN"
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && entrar()}
+            />
+          </label>
+          <button className="ops-btn ops-btn--primary" onClick={entrar}>
+            Entrar a caja
+          </button>
+        </section>
+        <div className="ops-scallop ops-scallop--bottom" aria-hidden="true" />
       </main>
     )
   }
 
   return (
-    <main className="card caja">
-      <div className="logo">DM</div>
-      <h1>🎪 Caja — Dulce Mezcla</h1>
+    <main className="ops-shell ops-shell--cash caja">
+      <div className="ops-scallop ops-scallop--top" aria-hidden="true" />
 
-      {!scanning && <button onClick={startScan}>📷 Escanear con cámara</button>}
-      {scanning && (
-        <>
-          <div id="reader" className="reader"></div>
-          <button className="btn-sec" onClick={stopScan}>
-            Detener cámara
-          </button>
-        </>
-      )}
+      <section className="cash-desk">
+        <header className="cash-hero">
+          <LogoLockup />
+          <a className="ops-btn ops-btn--soft" href="/admin">
+            Volver a Admin
+          </a>
+        </header>
 
-      <div className="o">— o —</div>
-      <div className="manual">
-        <input
-          placeholder="Escribe el código"
-          value={codigo}
-          onChange={(e) => setCodigo(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && buscar()}
-        />
-        <button className="btn-sec" onClick={() => buscar()}>
-          Buscar
-        </button>
-      </div>
+        <div className="cash-grid">
+          <section className="cash-scan-card">
+            <div className="ops-panel-head">
+              <div>
+                <p className="ops-section-label">Validación en stand</p>
+                <h2>Escanea o busca el cupón</h2>
+              </div>
+              <span className="ops-chip">Entrega segura</span>
+            </div>
 
-      {cupon && (
-        <div className="cupon-info">
-          <div className="codigo">{cupon.codigo}</div>
-          <p>
-            <span className={'badge ' + cupon.estado}>{etiquetaEstadoCupon(cupon.estado)}</span>
-          </p>
-          <p>
-            <b>Cliente:</b> {cupon.nombre_cliente || '—'}
-          </p>
-          <p>
-            <b>Promo:</b> {cupon.promocion || '—'}
-          </p>
-          {cupon.vence_en && (
-            <p>
-              <b>Vence:</b> {cupon.vence_en}
-            </p>
-          )}
-          {cupon.estado === 'DISPONIBLE' && (
-            <p className="aviso">
-              Este cupón todavía no fue reclamado por el cliente. Primero debe abrir el QR y escribir su
-              nombre.
-            </p>
-          )}
-          {cupon.estado === 'REDIMIDO' && (
-            <p className="ok">Este cupón ya fue entregado.</p>
-          )}
-          {cupon.estado === 'RECLAMADO' && (
-            <>
-              <input
-                placeholder="Detalle entregado (ej: cupcake)"
-                value={detalle}
-                onChange={(e) => setDetalle(e.target.value)}
-              />
-              <button onClick={confirmar} disabled={cargando}>
-                {cargando ? '...' : '✅ Confirmar entrega'}
+            {!scanning && (
+              <button className="ops-btn ops-btn--primary cash-scan-button" onClick={startScan}>
+                Escanear con cámara
               </button>
-            </>
-          )}
-          <button className="btn-sec" onClick={reset}>
-            Nuevo
-          </button>
-        </div>
-      )}
+            )}
 
-      {msg && <div className={msg.t === 'ok' ? 'ok' : 'error'}>{msg.x}</div>}
+            {scanning && (
+              <div className="cash-reader-wrap">
+                <div id="reader" className="reader cash-reader"></div>
+                <button className="ops-btn ops-btn--soft" onClick={stopScan}>
+                  Detener cámara
+                </button>
+              </div>
+            )}
+
+            <div className="cash-divider">
+              <span>o ingresa el código</span>
+            </div>
+
+            <div className="cash-manual">
+              <input
+                placeholder="DULCE-XXXXXX o URL del QR"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && buscar()}
+              />
+              <button className="ops-btn ops-btn--soft" onClick={() => buscar()} disabled={cargando}>
+                {cargando ? 'Buscando...' : 'Buscar'}
+              </button>
+            </div>
+
+            {msg && (
+              <div className={msg.t === 'ok' ? 'ops-alert ops-alert--ok' : 'ops-alert ops-alert--error'}>
+                {msg.x}
+              </div>
+            )}
+          </section>
+
+          <aside className="cash-result-card" aria-label="Resultado del cupón">
+            {!cupon && (
+              <div className="cash-empty">
+                <span aria-hidden="true">◇</span>
+                <h2>Esperando cupón</h2>
+                <p>Cuando escanees un QR reclamado aparecerán los datos del cliente y el botón de entrega.</p>
+              </div>
+            )}
+
+            {cupon && (
+              <div className="cash-ticket">
+                <p className="ops-section-label">Cupón encontrado</p>
+                <div className="cash-code">{cupon.codigo}</div>
+                <span className={'badge ' + cupon.estado}>{etiquetaEstadoCupon(cupon.estado)}</span>
+
+                <dl className="cash-details">
+                  <div>
+                    <dt>Cliente</dt>
+                    <dd>{cupon.nombre_cliente || '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Promoción</dt>
+                    <dd>{cupon.promocion || '—'}</dd>
+                  </div>
+                  {cupon.vence_en && (
+                    <div>
+                      <dt>Vence</dt>
+                      <dd>{cupon.vence_en}</dd>
+                    </div>
+                  )}
+                </dl>
+
+                {cupon.estado === 'DISPONIBLE' && (
+                  <p className="ops-alert ops-alert--notice">
+                    Este cupón todavía no fue reclamado por el cliente. Primero debe abrir el QR y escribir su nombre.
+                  </p>
+                )}
+
+                {cupon.estado === 'REDIMIDO' && <p className="ops-alert ops-alert--ok">Este cupón ya fue entregado.</p>}
+
+                {cupon.estado === 'RECLAMADO' && (
+                  <div className="cash-delivery">
+                    <label className="ops-field">
+                      <span>Detalle entregado</span>
+                      <input
+                        placeholder="Ej: cupcake, descuento 15%, torta mini"
+                        value={detalle}
+                        onChange={(e) => setDetalle(e.target.value)}
+                      />
+                    </label>
+                    <button className="ops-btn ops-btn--primary" onClick={confirmar} disabled={cargando}>
+                      {cargando ? 'Confirmando...' : 'Confirmar entrega'}
+                    </button>
+                  </div>
+                )}
+
+                <button className="ops-btn ops-btn--soft" onClick={reset}>
+                  Nuevo cupón
+                </button>
+              </div>
+            )}
+          </aside>
+        </div>
+      </section>
+
+      <div className="ops-scallop ops-scallop--bottom" aria-hidden="true" />
     </main>
   )
 }

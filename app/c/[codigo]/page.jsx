@@ -1,4 +1,5 @@
 import QRCode from 'qrcode'
+import { headers } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase'
 import { estaVencido } from '@/lib/fechas'
 import ClaimForm from '@/components/ClaimForm'
@@ -11,7 +12,12 @@ const DEFAULT_DESCRIPTION = 'Válido en todos nuestros productos de pastelería 
 
 function buildCouponUrl(codigo) {
   const base = (process.env.NEXT_PUBLIC_BASE_URL || '').trim().replace(/\/+$/, '')
-  return `${base}/c/${codigo}`
+  if (base) return `${base}/c/${codigo}`
+
+  const h = headers()
+  const host = h.get('x-forwarded-host') || h.get('host') || ''
+  const proto = h.get('x-forwarded-proto') || 'https'
+  return host ? `${proto}://${host}/c/${codigo}` : `/c/${codigo}`
 }
 
 async function buildQr(url) {
@@ -245,9 +251,9 @@ export default async function CuponPage({ params }) {
         vence={cupon.vence_en}
         qrDataUrl={qrDataUrl}
         tone="redeemed"
-        statusTitle="Este cupón ya fue redimido"
-        statusText="Presenta este cupón en caja para validarlo."
-        qrPill="Cupón redimido correctamente"
+        statusTitle="Este cupón ya fue entregado"
+        statusText="El beneficio ya fue aplicado en caja."
+        qrPill="Cupón entregado correctamente"
       />
     )
   }

@@ -1,10 +1,20 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import QRCode from 'qrcode'
+import { etiquetaEstadoCupon } from '@/lib/cuponCodigo'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || ''
 const ESTADOS = ['TODOS', 'DISPONIBLE', 'RECLAMADO', 'REDIMIDO', 'ANULADO', 'ELIMINADO']
 const PREFIJOS = ['TODOS', 'DULCE', 'MEZCLA']
+
+function getBaseUrl() {
+  const base = BASE || (typeof window !== 'undefined' ? window.location.origin : '')
+  return base.replace(/\/+$/, '')
+}
+
+function getCouponUrl(cod) {
+  return `${getBaseUrl()}/c/${cod}`
+}
 
 export default function Admin() {
   const [pin, setPin] = useState('')
@@ -163,11 +173,11 @@ export default function Admin() {
   }
 
   async function verQR(cod) {
-    const dataUrl = await QRCode.toDataURL(BASE + '/c/' + cod, { width: 420, margin: 2 })
+    const dataUrl = await QRCode.toDataURL(getCouponUrl(cod), { width: 420, margin: 2 })
     setQrModal({ cod, dataUrl })
   }
   async function descargarUno(cod) {
-    const dataUrl = await QRCode.toDataURL(BASE + '/c/' + cod, { width: 700, margin: 2 })
+    const dataUrl = await QRCode.toDataURL(getCouponUrl(cod), { width: 700, margin: 2 })
     const a = document.createElement('a')
     a.href = dataUrl
     a.download = cod + '.png'
@@ -181,7 +191,7 @@ export default function Admin() {
     const JSZip = (await import('jszip')).default
     const zip = new JSZip()
     for (const cod of sel) {
-      const dataUrl = await QRCode.toDataURL(BASE + '/c/' + cod, { width: 700, margin: 2 })
+      const dataUrl = await QRCode.toDataURL(getCouponUrl(cod), { width: 700, margin: 2 })
       zip.file(cod + '.png', dataUrl.split(',')[1], { base64: true })
     }
     const blob = await zip.generateAsync({ type: 'blob' })
@@ -192,7 +202,7 @@ export default function Admin() {
   }
 
   function compartir(cod) {
-    const url = BASE + '/c/' + cod
+    const url = getCouponUrl(cod)
     const texto = encodeURIComponent('Tu cupón de Dulce Mezcla 🧁')
     window.open('https://wa.me/?text=' + texto + '%20' + encodeURIComponent(url), '_blank')
   }
@@ -241,7 +251,7 @@ export default function Admin() {
         </div>
         <div className="stat red">
           <b>{stats?.REDIMIDO ?? '—'}</b>
-          <span>Redimidos</span>
+          <span>Entregados</span>
         </div>
         <div className="stat elim">
           <b>{stats?.ELIMINADO ?? '—'}</b>
@@ -359,7 +369,7 @@ export default function Admin() {
                   </td>
                   <td className="mono">{c.codigo}</td>
                   <td>
-                    <span className={'badge ' + c.estado}>{c.estado}</span>
+                    <span className={'badge ' + c.estado}>{etiquetaEstadoCupon(c.estado)}</span>
                   </td>
                   <td>{c.promocion}</td>
                   <td>{c.nombre_cliente || '—'}</td>
@@ -397,7 +407,7 @@ export default function Admin() {
             <h3>{qrModal.cod}</h3>
             <img src={qrModal.dataUrl} alt="QR" />
             <p className="mono">
-              {BASE}/c/{qrModal.cod}
+              {getCouponUrl(qrModal.cod)}
             </p>
             <div className="modal-acc">
               <button onClick={() => descargarUno(qrModal.cod)}>Descargar PNG</button>

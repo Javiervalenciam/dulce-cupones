@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { normalizarCodigoCupon } from '@/lib/cuponCodigo'
 
 function pinOk(req) {
   return req.headers.get('x-admin-pin') === process.env.ADMIN_PIN
@@ -11,9 +12,9 @@ export async function POST(req) {
   }
   try {
     const { codigo } = await req.json()
-    const cod = String(codigo || '')
-      .trim()
-      .toUpperCase()
+    const cod = normalizarCodigoCupon(codigo)
+    if (!cod) return NextResponse.json({ ok: true, cupon: null })
+
     const { data, error } = await supabaseAdmin
       .from('cupones')
       .select('*')

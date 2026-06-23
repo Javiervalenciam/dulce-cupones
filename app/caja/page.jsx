@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { etiquetaEstadoCupon, normalizarCodigoCupon } from '@/lib/cuponCodigo'
 
 export default function Caja() {
   const [pin, setPin] = useState('')
@@ -31,17 +32,11 @@ export default function Caja() {
   }
 
   function parseCodigo(text) {
-    try {
-      const u = new URL(text)
-      const parts = u.pathname.split('/').filter(Boolean)
-      return (parts[parts.length - 1] || '').toUpperCase()
-    } catch (e) {
-      return String(text).trim().toUpperCase()
-    }
+    return normalizarCodigoCupon(text)
   }
 
   async function buscar(cod) {
-    const c = (cod || codigo).trim().toUpperCase()
+    const c = parseCodigo(cod || codigo)
     if (!c) {
       setMsg({ t: 'error', x: 'Escribe o escanea un código' })
       return
@@ -69,15 +64,21 @@ export default function Caja() {
   }
 
   async function confirmar() {
+    const c = parseCodigo(codigo)
+    if (!c) {
+      setMsg({ t: 'error', x: 'Escanea o busca un cupón primero' })
+      return
+    }
     setCargando(true)
     const res = await fetch('/api/redeem', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigo, detalle, pin }),
+      body: JSON.stringify({ codigo: c, detalle, pin }),
     })
     const j = await res.json()
     setCargando(false)
     if (j.ok) {
+      setCodigo(j.cupon.codigo)
       setMsg({ t: 'ok', x: '✅ Entregado a ' + (j.cupon.nombre_cliente || 'cliente') })
       setCupon(j.cupon)
     } else {
@@ -176,13 +177,10 @@ export default function Caja() {
         <div className="cupon-info">
           <div className="codigo">{cupon.codigo}</div>
           <p>
-            <span className={'badge ' + cupon.estado}>{cupon.estado}</span>
+            <span className={'badge ' + cupon.estado}>{etiquetaEstadoCupon(cupon.estado)}</span>
           </p>
           <p>
             <b>Cliente:</b> {cupon.nombre_cliente || '—'}
-          </p>
-          <p>
-            <b>Teléfono:</b> {cupon.telefono_cliente || '—'}
           </p>
           <p>
             <b>Promo:</b> {cupon.promocion || '—'}
@@ -192,7 +190,16 @@ export default function Caja() {
               <b>Vence:</b> {cupon.vence_en}
             </p>
           )}
-          {cupon.estado !== 'REDIMIDO' && (
+          {cupon.estado === 'DISPONIBLE' && (
+            <p className="aviso">
+              Este cupón todavía no fue reclamado por el cliente. Primero debe abrir el QR y escribir su
+              nombre.
+            </p>
+          )}
+          {cupon.estado === 'REDIMIDO' && (
+            <p className="ok">Este cupón ya fue entregado.</p>
+          )}
+          {cupon.estado === 'RECLAMADO' && (
             <>
               <input
                 placeholder="Detalle entregado (ej: cupcake)"

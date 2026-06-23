@@ -2093,3 +2093,150 @@ button:disabled {
     font-size: 24px;
   }
 }
+
+/* Portada inicial */
+.home-shell {
+  align-items: center;
+  justify-content: center;
+}
+
+.home-panel {
+  position: relative;
+  z-index: 1;
+  width: min(520px, calc(100% - 28px));
+  margin: 36px auto;
+  padding: 30px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 252, 249, 0.92)),
+    #fff;
+  box-shadow:
+    0 26px 62px rgba(91, 74, 68, 0.14),
+    0 0 0 1px rgba(240, 221, 226, 0.58);
+  text-align: center;
+}
+
+.home-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.home-logo .ops-logo-ring {
+  width: 118px;
+  height: 118px;
+}
+
+.home-panel h1 {
+  margin: 0;
+  color: #3f241c;
+  font-family: 'Cooper Black', 'Arial Rounded MT Bold', Georgia, serif;
+  font-size: 46px;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.home-lead {
+  max-width: 38ch;
+  margin: 12px auto 0;
+  color: #705b54;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.home-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.home-option {
+  min-height: 78px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(240, 221, 226, 0.9);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 12px 26px rgba(91, 74, 68, 0.08);
+  color: var(--texto);
+  text-align: left;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.home-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(244, 151, 142, 0.48);
+  box-shadow: 0 18px 34px rgba(91, 74, 68, 0.12);
+}
+
+.home-option:focus-visible {
+  outline: 3px solid rgba(91, 191, 181, 0.35);
+  outline-offset: 3px;
+}
+
+.home-option-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.home-option--admin .home-option-icon {
+  color: #df6575;
+  background: rgba(251, 213, 219, 0.62);
+}
+
+.home-option--cash .home-option-icon {
+  color: #2d7d72;
+  background: rgba(91, 191, 181, 0.15);
+}
+
+.home-option strong,
+.home-option small {
+  display: block;
+}
+
+.home-option strong {
+  color: #3f241c;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.home-option small {
+  margin-top: 4px;
+  color: #806a62;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.home-note {
+  margin: 18px 0 0;
+  color: #9a8a84;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 420px) {
+  .home-panel {
+    padding: 24px 18px;
+  }
+
+  .home-panel h1 {
+    font-size: 38px;
+  }
+
+  .home-option {
+    align-items: flex-start;
+  }
+}

@@ -167,6 +167,12 @@ export default function Admin() {
     }
   }
 
+  async function actualizarCupones() {
+    setAviso('Actualizando cupones...')
+    await Promise.all([cargarStats(), cargarLista()])
+    setAviso('Cupones actualizados')
+  }
+
   function toggleSel(cod) {
     setSel((s) => (s.includes(cod) ? s.filter((x) => x !== cod) : [...s, cod]))
   }
@@ -394,6 +400,9 @@ export default function Admin() {
           </div>
 
           <div className="ops-actions">
+            <button className="ops-btn ops-btn--primary" onClick={actualizarCupones} disabled={cargando}>
+              {cargando ? 'Actualizando...' : 'Actualizar cupones'}
+            </button>
             <button className="ops-btn ops-btn--soft" onClick={descargarSeleccion}>
               Descargar QR ({sel.length})
             </button>

@@ -816,54 +816,65 @@ button:disabled {
   gap: 18px;
 }
 
-.coupon-discount-seal {
+.coupon-treat-visual {
   width: 112px;
   height: 112px;
   position: relative;
   display: grid;
   place-items: center;
-  align-content: center;
   border-radius: 999px;
-  border: 4px solid var(--rosa-claro);
   background:
-    radial-gradient(circle at center, #fff9f5 0 58%, rgba(251, 213, 219, 0.55) 59% 100%);
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.96) 0 42%, transparent 43%),
+    conic-gradient(from 12deg, rgba(251, 213, 219, 0.9), rgba(91, 191, 181, 0.2), rgba(244, 151, 142, 0.72), rgba(251, 213, 219, 0.9));
+  border: 4px solid rgba(251, 213, 219, 0.95);
   box-shadow:
-    inset 0 0 0 3px rgba(255, 255, 255, 0.9),
-    0 8px 18px rgba(244, 151, 142, 0.18);
-  text-align: center;
+    inset 0 0 0 4px rgba(255, 255, 255, 0.86),
+    0 12px 26px rgba(244, 151, 142, 0.2);
 }
 
-.coupon-discount-seal::before,
-.coupon-discount-seal::after {
+.coupon-treat-visual::before {
+  content: '';
   position: absolute;
-  color: rgba(91, 191, 181, 0.62);
-  font-size: 15px;
-  line-height: 1;
+  inset: 11px;
+  border-radius: inherit;
+  border: 1px dashed rgba(244, 151, 142, 0.45);
 }
 
-.coupon-discount-seal::before {
-  content: '♥';
-  top: 17px;
+.coupon-treat-visual svg {
+  position: relative;
+  z-index: 1;
+  width: 78px;
+  height: 78px;
+  filter: drop-shadow(0 8px 10px rgba(91, 74, 68, 0.14));
 }
 
-.coupon-discount-seal::after {
-  content: '♥';
-  bottom: 15px;
+.coupon-treat-spark {
+  position: absolute;
+  z-index: 2;
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  background: var(--rosa);
+  transform: rotate(45deg);
 }
 
-.coupon-discount-seal span {
-  color: #ef6d7b;
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 900;
+.coupon-treat-spark::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 999px;
+  background: #fff;
 }
 
-.coupon-discount-seal small {
-  margin-top: 4px;
-  color: #ef6d7b;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
+.coupon-treat-spark--top {
+  top: 12px;
+  right: 25px;
+  background: var(--turquesa);
+}
+
+.coupon-treat-spark--bottom {
+  left: 23px;
+  bottom: 16px;
 }
 
 .coupon-promo-copy {

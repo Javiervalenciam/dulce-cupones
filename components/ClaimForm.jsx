@@ -6,11 +6,6 @@ import SocialFooter from './SocialFooter'
 const DEFAULT_PROMO = 'En tu próxima compra'
 const DEFAULT_DESCRIPTION = 'Válido en todos nuestros productos de pastelería y repostería.'
 
-function getDiscount(promocion) {
-  const match = String(promocion || '').match(/(\d{1,2})\s*%/)
-  return match ? `${match[1]}%` : '15%'
-}
-
 function StateIcon({ tone }) {
   const paths = {
     available: (
@@ -133,9 +128,40 @@ export default function ClaimForm({ codigo, promocion, descripcion, vence, qrDat
               <div className="coupon-divider" aria-hidden="true" />
 
               <div className="coupon-promo">
-                <div className="coupon-discount-seal">
-                  <span>{getDiscount(safePromo)}</span>
-                  <small>DESCUENTO</small>
+                <div className="coupon-treat-visual" aria-hidden="true">
+                  <span className="coupon-treat-spark coupon-treat-spark--top" />
+                  <svg viewBox="0 0 96 96" fill="none">
+                    <path
+                      d="M27 43c1.9-12.3 11.2-21 21-21s19.1 8.7 21 21"
+                      fill="#FBD5DB"
+                      stroke="#F4978E"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M23 44h50l-6.4 34.5H29.4L23 44Z"
+                      fill="#5BBFB5"
+                      stroke="#3E9F96"
+                      strokeWidth="3"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M35 44c0-7 5.7-12.7 12.8-12.7S60.5 37 60.5 44"
+                      stroke="#FFF6EC"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M38 59h20M36 68h24"
+                      stroke="#FFF6EC"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+                    <circle cx="32" cy="31" r="4" fill="#F4978E" />
+                    <circle cx="64" cy="31" r="4" fill="#5BBFB5" />
+                    <path d="M48 14v8M44 18h8" stroke="#F4978E" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                  <span className="coupon-treat-spark coupon-treat-spark--bottom" />
                 </div>
                 <div className="coupon-promo-copy">
                   <strong>{safePromo}</strong>

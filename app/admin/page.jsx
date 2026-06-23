@@ -31,35 +31,56 @@ export default function Admin() {
   )
 
   const cargarStats = useCallback(async () => {
-    const res = await fetch('/api/stats', { method: 'POST', headers: headers() })
-    const j = await res.json()
-    if (j.ok) setStats({ ...j.stats, TOTAL: j.total })
+    try {
+      const res = await fetch('/api/stats', { method: 'POST', headers: headers() })
+      const j = await res.json()
+      if (j.ok) setStats({ ...j.stats, TOTAL: j.total })
+      else setAviso(j.error || 'No se pudieron cargar las estadisticas')
+    } catch (e) {
+      setAviso('Error al cargar estadisticas: ' + ((e && e.message) || ''))
+    }
   }, [headers])
 
   const cargarLista = useCallback(async () => {
     setCargando(true)
-    const res = await fetch('/api/list', {
-      method: 'POST',
-      headers: headers(),
-      body: JSON.stringify({ estado: filtroEstado, prefijo: filtroPrefijo, q: busqueda }),
-    })
-    const j = await res.json()
-    setCargando(false)
-    if (j.ok) setCupones(j.cupones || [])
-    else setAviso(j.error || 'Error')
+    try {
+      const res = await fetch('/api/list', {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ estado: filtroEstado, prefijo: filtroPrefijo, q: busqueda }),
+      })
+      const j = await res.json()
+      if (j.ok) setCupones(j.cupones || [])
+      else setAviso(j.error || 'Error')
+    } catch (e) {
+      setAviso('Error al cargar la lista: ' + ((e && e.message) || ''))
+    } finally {
+      setCargando(false)
+    }
   }, [headers, filtroEstado, filtroPrefijo, busqueda])
 
   async function entrar() {
-    const res = await fetch('/api/stats', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-pin': pin },
-    })
-    const j = await res.json()
-    if (j.ok) {
-      setAuth(true)
-      localStorage.setItem('dm_pin', pin)
-    } else {
-      setAviso('PIN incorrecto')
+    setAviso('')
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      })
+      let j = {}
+      try {
+        j = await res.json()
+      } catch {
+        j = {}
+      }
+      if (res.ok && j.ok) {
+        setAuth(true)
+        localStorage.setItem('dm_pin', pin)
+      } else {
+        setAviso(j.error || 'No se pudo entrar (error ' + res.status + ')')
+      }
+    } catch (e) {
+      setAviso('No se pudo conectar con el servidor: ' + ((e && e.message) || ''))
     }
   }
 

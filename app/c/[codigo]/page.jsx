@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { estaVencido } from '@/lib/fechas'
 import ClaimForm from '@/components/ClaimForm'
 import ShareButtons from '@/components/ShareButtons'
+import SocialFooter from '@/components/SocialFooter'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +23,7 @@ export default async function CuponPage({ params }) {
         <div className="logo">DM</div>
         <h1>Cupón no encontrado</h1>
         <p>Verifica el enlace o acércate a nuestro stand.</p>
+        <SocialFooter />
       </main>
     )
   }
@@ -30,6 +32,7 @@ export default async function CuponPage({ params }) {
       <main className="card">
         <div className="logo">DM</div>
         <h1>Cupón no disponible</h1>
+        <SocialFooter />
       </main>
     )
   }
@@ -39,6 +42,7 @@ export default async function CuponPage({ params }) {
         <div className="logo">DM</div>
         <h1>⏰ Cupón vencido</h1>
         <p>Este cupón expiró el {cupon.vence_en}.</p>
+        <SocialFooter />
       </main>
     )
   }
@@ -48,6 +52,7 @@ export default async function CuponPage({ params }) {
         <div className="logo">DM</div>
         <h1>🎉 Este cupón ya fue entregado</h1>
         <div className="codigo">{cupon.codigo}</div>
+        <SocialFooter />
       </main>
     )
   }
@@ -61,6 +66,7 @@ export default async function CuponPage({ params }) {
         <p className="promo">{cupon.promocion}</p>
         {cupon.vence_en && <p className="vence">Válido hasta {cupon.vence_en}</p>}
         <ShareButtons url={url} texto={`Mira mi cupón de Dulce Mezcla: ${cupon.promocion || ''}`} />
+        <SocialFooter />
       </main>
     )
   }

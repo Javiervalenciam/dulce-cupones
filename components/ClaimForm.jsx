@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import ShareButtons from './ShareButtons'
+import SocialFooter from './SocialFooter'
 
 export default function ClaimForm({ codigo, promocion, descripcion, vence, url }) {
   const [nombre, setNombre] = useState('')
@@ -34,6 +35,7 @@ export default function ClaimForm({ codigo, promocion, descripcion, vence, url }
         <p>Muestra esta pantalla en el stand de Dulce Mezcla para recibir tu sorpresa.</p>
         <div className="codigo">{codigo}</div>
         <ShareButtons url={url} texto={`Mira mi cupón de Dulce Mezcla: ${promocion || ''}`} />
+        <SocialFooter />
       </main>
     )
   }
@@ -61,6 +63,7 @@ export default function ClaimForm({ codigo, promocion, descripcion, vence, url }
         <button disabled={cargando}>{cargando ? 'Activando...' : 'Activar mi cupón'}</button>
       </form>
       {estado === 'error' && <p className="error">{mensaje}</p>}
+      <SocialFooter />
     </main>
   )
 }

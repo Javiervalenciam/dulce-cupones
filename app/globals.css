@@ -451,3 +451,41 @@ button:disabled {
     grid-column: span 2;
   }
 }
+
+/* Redes (pie del cupon) */
+.social {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--linea);
+}
+.social-title {
+  font-size: 13px;
+  color: #9a8a84;
+  margin: 0 0 10px;
+}
+.social-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+}
+.social-link.ig {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+.social-link.wa {
+  background: #25d366;
+}
+.social-link svg {
+  display: block;
+}
